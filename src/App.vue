@@ -1,22 +1,40 @@
 <template>
   <img alt="Vue logo" src="./assets/logo.png" />
   <HelloWorld msg="Hello Vue 3.0 + Vite" />
-  <h1>{{count}}</h1>
-  <button @click='add'>click</button>
-  <li v-for='(item,i) in state.arr' :key='i'>{{item}}</li>
-  <p>{{msg}}</p>
+  <h1>{{ count }}</h1>
+  <button @click="add">click</button>
+  <li v-for="(item, i) in state.arr" :key="i">{{ item }}</li>
+  <p>{{ msg }}</p>
+  <h1>{{ myRefData }}</h1>
 </template>
 
 <script>
 import HelloWorld from './components/HelloWorld.vue'
-import {ref,reactive} from 'vue'
+import { ref, reactive, customRef } from 'vue'
 
-function createFun(){
+function createFun() {
   let state = reactive({
-    arr:[1,2,3]
+    arr: [1, 2, 3]
   })
 
-  return {state}
+  return { state }
+}
+
+function myRef(v) {
+  return customRef((track, trigger) => {
+    return {
+      get: function () {
+        track()
+        console.log('get')
+        return v
+      },
+      set(nv) {
+        console.log('set')
+        v = nv
+        trigger()
+      }
+    }
+  })
 }
 
 export default {
@@ -30,19 +48,21 @@ export default {
     //   arr:[1,2,3]
     // })
 
-    let {state} = createFun() 
+    let { state } = createFun()
+    let myRefData = myRef('this is myRefdata')
 
-    function add () {
+    function add() {
       count.value++
+      myRefData.value = 'after change'
       state.arr.push(count.value)
     }
 
-    return {count,add,state}
+    return { count, add, state, myRefData }
   },
-  data(){
-      return {
-        msg:"this is data in options Api "
-      }
+  data() {
+    return {
+      msg: 'this is data in options Api '
     }
+  }
 }
 </script>
