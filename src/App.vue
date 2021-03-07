@@ -2,6 +2,8 @@
   <img alt="Vue logo" src="./assets/logo.png" />
   <HelloWorld msg="Hello Vue 3.0 + Vite" />
   <h1>{{ count }}</h1>
+  <h1>{{ refObj.a }}</h1>
+  <h1>{{ read.name }}</h1>
   <button @click="add">click</button>
   <li v-for="(item, i) in state.arr" :key="i">{{ item }}</li>
   <p>{{ msg }}</p>
@@ -10,7 +12,7 @@
 
 <script>
 import HelloWorld from './components/HelloWorld.vue'
-import { ref, reactive, customRef } from 'vue'
+import { ref, reactive, customRef, readonly } from 'vue'
 
 function createFun() {
   let state = reactive({
@@ -25,7 +27,7 @@ function myRef(v) {
     return {
       get: function () {
         track()
-        console.log('get')
+        console.log('get', v)
         return v
       },
       set(nv) {
@@ -48,16 +50,24 @@ export default {
     //   arr:[1,2,3]
     // })
 
+    let refObj = ref({
+      a: 'this is a in refObj'
+    })
+
+    let read = readonly({ name: 'this is readonly' })
     let { state } = createFun()
     let myRefData = myRef('this is myRefdata')
 
     function add() {
       count.value++
+      // read = readonly({ name: 'afterchange readonly' })
+      read = reactive({ name: 'after change' })
+      refObj.value.a = 'change refOvj.a'
       myRefData.value = 'after change'
       state.arr.push(count.value)
     }
 
-    return { count, add, state, myRefData }
+    return { count, add, state, myRefData, refObj, read }
   },
   data() {
     return {
